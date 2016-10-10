@@ -41,6 +41,7 @@ with open('data/train_yesno/wav.scp', 'w') as train_text, open('data/test_yesno/
 
 
 # finish this method
+
 def utt2spk(filenames):
     results = []
     for filename in filenames:
