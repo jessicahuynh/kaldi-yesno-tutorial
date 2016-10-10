@@ -1,8 +1,11 @@
 #! /usr/bin/env python
 
+# NOTE: in addition to this file, I also had to modify lm/task.arpabo and switch NO for LO and YES for KEN
+
 import os
 import os.path
 import sys
+import subprocess
 
 zeroes = []
 ones = []
@@ -11,7 +14,7 @@ def text(filenames):
     results = []
     for filename in filenames:
         basename = filename.split('.')[0]
-        transcript = basename.replace('1', 'YES').replace('0', 'NO').replace('_', " ")
+        transcript = basename.replace('1', 'KEN').replace('0', 'LO').replace('_', " ")
         results.append("{} {}".format(basename.split('.')[0], transcript))
 
     return '\n'.join(sorted(results))
@@ -40,8 +43,8 @@ def prep_dict():
     os.system('mkdir dict')
 
     # initial dictionaries
-    os.system('echo -e "Y\nN" > dict/phones.txt') 
-    os.system('echo -e "YES Y\nNO N" > dict/lexicon.txt')
+    os.system('echo -e "K\nEH\nN\nL\nOW" > dict/phones.txt') 
+    os.system('echo -e "KEN K EH N\nLO L OW" > dict/lexicon.txt')
 
     # add phone for silence
     os.system('echo "SIL" > dict/silence_phones.txt')
@@ -53,6 +56,10 @@ def prep_dict():
     os.system('echo "<SIL> SIL" >> dict/lexicon.txt')
 
 if __name__ == '__main__':
+    os.system('mkdir data')
+    os.system('mkdir data/train_yesno')
+    os.system('mkdir data/test_yesno')
+    
     # DATA PREP
     for fn in os.listdir('waves_yesno'):
         if fn.startswith('0'):
@@ -82,10 +89,26 @@ if __name__ == '__main__':
     prep_dict()
 
     # dictionary to FST
-    os.system('utils/prepare_lang.sh --position-dependent-phones false dict "SIL" dict/tmp data/lang')
+    os.system('utils/prepare_lang.sh --position-dependent-phones false dict "<SIL>" dict/tmp data/lang')
     # sm to FST
     os.system('lm/prepare_lm.sh')
 
     # FEATURE EXTRACTION AND TRAINING
     # extract MFCC
-    os.system('steps/make_mfcc.sh --nj 1 <INPUT_DIR> exp/make_mfcc/train_yesno')
+    os.system('steps/make_mfcc.sh --nj 1 data/train_yesno exp/make_mfcc/train_yesno')
+    # normalize cepstral features
+    os.system('steps/compute_cmvn_stats.sh data/train_yesno exp/make_mfcc/train_yesno')
+    # train monophone models
+    os.system('steps/train_mono.sh --nj 1 --cmd utils/run.pl data/train_yesno data/lang exp/mono')
+
+    # DECODING
+    # project test set into feature space
+    os.system('steps/make_mfcc.sh --nj 1 data/test_yesno exp/make_mfcc/test_yesno')
+    os.system('steps/compute_cmvn_stats.sh data/test_yesno exp/make_mfcc/test_yesno')
+    # build fully connected FST network
+    os.system('utils/mkgraph.sh --mono data/lang_test_tg exp/mono exp/mono/graph_tgpr')
+    # find best path
+    os.system('mkdir exp/mono/decode_test_yesno')
+    os.system('steps/decode.sh --nj 1 exp/mono/graph_tgpr data/test_yesno exp/mono/decode_test_yesno')
+    # get alignment
+    os.system('steps/get_ctm.sh data/test_yesno data/lang exp/mono/decode_test_yesno')

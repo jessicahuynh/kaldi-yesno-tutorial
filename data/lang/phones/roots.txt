@@ -1,3 +1,6 @@
 shared split SIL
-shared split Y
+shared split K
+shared split EH
 shared split N
+shared split L
+shared split OW

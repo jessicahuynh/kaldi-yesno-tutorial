@@ -3,8 +3,8 @@
 ngram 1=4
 
 \1-grams:
--1	NO
--1	YES
+-1	LO
+-1	KEN
 -99 <s>
 -1 </s>
 
