@@ -45,26 +45,26 @@ def prep_dict():
 
     # initial dictionaries
     with open('dict/phones.txt', 'w') as f:
-        f.write('K\nEH\nN\nL\nOW')
+        f.write('K\nEH\nN\nL\nOW\n')
     f.close()
     with open('dict/lexicon.txt', 'w') as f:
         f.write('KEN K EH N\n')
-        f.write('LO L OW')
+        f.write('LO L OW\n')
     f.close()
 
     # add phone for silence
     with open('dict/silence_phones.txt', 'w') as f:
-        f.write('SIL')
+        f.write('SIL\n')
     f.close()
     with open('dict/optional_silence.txt', 'w') as f:
-        f.write('SIL')
+        f.write('SIL\n')
     f.close()
     os.system('mv dict/phones.txt dict/nonsilence_phones.txt')
 
     # amend lexicon to include silence
     os.system('cp dict/lexicon.txt dict/lexicon_words.txt')
     with open('dict/lexicon.txt', 'a') as f:
-        f.write('\n<SIL> SIL')
+        f.write('<SIL> SIL\n')
     f.close()
 
 if __name__ == '__main__':

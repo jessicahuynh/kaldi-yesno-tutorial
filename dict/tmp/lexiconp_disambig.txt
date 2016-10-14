@@ -1,0 +1,3 @@
+KEN	1.0	K EH N
+LO	1.0	L OW
+<SIL>	1.0	SIL
