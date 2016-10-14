@@ -44,17 +44,28 @@ def prep_dict():
     os.system('mkdir dict')
 
     # initial dictionaries
-    os.system('echo -e "K\nEH\nN\nL\nOW" > dict/phones.txt') 
-    os.system('echo -e "KEN K EH N\nLO L OW" > dict/lexicon.txt')
+    with open('dict/phones.txt', 'w') as f:
+        f.write('K\nEH\nN\nL\nOW')
+    f.close()
+    with open('dict/lexicon.txt', 'w') as f:
+        f.write('KEN K EH N\n')
+        f.write('LO L OW')
+    f.close()
 
     # add phone for silence
-    os.system('echo "SIL" > dict/silence_phones.txt')
-    os.system('echo "SIL" > dict/optional_silence.txt')
+    with open('dict/silence_phones.txt', 'w') as f:
+        f.write('SIL')
+    f.close()
+    with open('dict/optional_silence.txt', 'w') as f:
+        f.write('SIL')
+    f.close()
     os.system('mv dict/phones.txt dict/nonsilence_phones.txt')
 
     # amend lexicon to include silence
     os.system('cp dict/lexicon.txt dict/lexicon_words.txt')
-    os.system('echo "<SIL> SIL" >> dict/lexicon.txt')
+    with open('dict/lexicon.txt', 'a') as f:
+        f.write('\n<SIL> SIL')
+    f.close()
 
 if __name__ == '__main__':
     os.system('mkdir data')
