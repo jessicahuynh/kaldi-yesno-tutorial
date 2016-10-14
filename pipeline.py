@@ -68,9 +68,9 @@ def prep_dict():
     f.close()
 
 if __name__ == '__main__':
-    os.system('mkdir data')
-    os.system('mkdir data/train_yesno')
-    os.system('mkdir data/test_yesno')
+    os.system('mkdir data/')
+    os.system('mkdir data/train_yesno/')
+    os.system('mkdir data/test_yesno/')
     
     # DATA PREP
     for fn in os.listdir('waves_yesno'):
